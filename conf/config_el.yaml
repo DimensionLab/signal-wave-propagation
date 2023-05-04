@@ -1,0 +1,30 @@
+defaults :
+  - modulus_default
+  - arch:
+      - fully_connected
+  - scheduler: tf_exponential_lr
+  - optimizer: adam
+  - loss: sum
+  - _self_
+
+summary_histograms: true
+jit : true
+save_filetypes : "vtk"
+
+optimizer:
+  lr: 0.0000005
+
+training:
+  rec_results_freq: 500
+  max_steps : 10000
+
+
+batch_size:
+  Interior_right: 1000
+  Interior_left: 1000
+  Refl_x: 100
+  Refl_y: 100
+  Trans_x: 100
+  Trans_y: 100
+
+
