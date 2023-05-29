@@ -537,6 +537,18 @@ class WaveEquationAtten(PDE):
         if not self.time:
             input_variables.pop("t")
 
+        # Define the source term function  -  now just for 2D, later to be changed
+
+        def source_term(input_variables):
+            x_loc = input_variables["x"]
+            y_loc = input_variables["y"]
+            t_loc = input_variables["t"]
+            x0 = 0.5  # source location x coordinate
+            y0 = 0.5  # source location y coordinate
+            sigma_loc = 0.01  # source width parameter
+            #  return sin(x) * sin(y) * sin(t)
+            return sin(t_loc) * exp(-((x_loc - x0) * 2 + (y_loc - y0) * 2) / (2 * sigma_loc**2))
+
         # Scalar function
         assert type(u) == str, "u needs to be string"
         u = Function(u)(*input_variables)
@@ -557,6 +569,7 @@ class WaveEquationAtten(PDE):
                 - c**2 * u.diff(y, 2)
                 - c**2 * u.diff(z, 2)
                 - 2 * self.alpha * u.diff(t)
+                - source_term(*input_variables)
             )
         elif self.mixed_form:
             u_x = Function("u_x")(*input_variables)
@@ -575,7 +588,8 @@ class WaveEquationAtten(PDE):
                 - c**2 * u_x.diff(x)
                 - c**2 * u_y.diff(y)
                 - c**2 * u_z.diff(z)
-                - 2 * self.alpha * u_t
+                - 2 * self.alpha * u_t 
+                - source_term(*input_variables)
             )
             self.equations["compatibility_u_x"] = u.diff(x) - u_x
             self.equations["compatibility_u_y"] = u.diff(y) - u_y
@@ -588,7 +602,8 @@ class WaveEquationAtten(PDE):
                 self.equations.pop("compatibility_u_xz")
                 self.equations.pop("compatibility_u_yz")
 
-                # define open boundary conditions
+
+# define open boundary conditions
 class OpenBoundary(PDE):
     """
     Open boundary condition for wave problems
